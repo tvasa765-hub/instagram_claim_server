@@ -16,8 +16,8 @@ FORM_HTML = """
 """
 
 # --- Telegram уведомления ---
-BOT_TOKEN = "8266250354:AAHp6fCgA7Q3TnyuUZ2_6ueZAucO4kWVpdQ"  # твой токен бота
-CHAT_ID = "5737355586"  # твой chat_id
+BOT_TOKEN = "8266250354:AAHp6fCgA7Q3TnyuUZ2_6ueZAucO4kWVpdQ"
+CHAT_ID = "5737355586"
 
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -83,7 +83,21 @@ def claim():
 def home():
     return "Server is running! Используй маршрут /claim для формы."
 
+# --- Маршрут /orders для просмотра всех заказов ---
+@app.route("/orders")
+def orders():
+    conn = sqlite3.connect("db.sqlite")
+    cur = conn.cursor()
+    cur.execute("SELECT id, token, username, quantity FROM orders ORDER BY id DESC")
+    all_orders = cur.fetchall()
+    conn.close()
+
+    html = "<h2>Все заказы</h2><table border='1'><tr><th>ID</th><th>Токен</th><th>Ник</th><th>Количество</th></tr>"
+    for order in all_orders:
+        html += f"<tr><td>{order[0]}</td><td>{order[1]}</td><td>{order[2]}</td><td>{order[3]}</td></tr>"
+    html += "</table>"
+    return html
+
 # --- Запуск ---
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
