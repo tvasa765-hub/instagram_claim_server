@@ -71,6 +71,10 @@ def claim():
 
     return f"Заказ принят! Ник: {username}, Количество: {quantity}"
 
+@app.route("/")
+def home():
+    return "Server is running! Используй маршрут /claim для формы."
+
 # --- Запуск локально ---
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
