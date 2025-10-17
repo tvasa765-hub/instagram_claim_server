@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template_string
 import sqlite3
 import requests
+from flask import Flask, request, render_template_string, render_template
 
 app = Flask(__name__)
 
@@ -158,7 +159,7 @@ def claim():
     used, quantity = row
     if used:
         conn.close()
-        return "⚠️ Этот токен уже использован", 400
+        return render_template("used_token.html")
 
     if request.method == "GET":
         conn.close()

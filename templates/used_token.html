@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Токен использован</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #1e1e2f, #282846);
+      color: #fff;
+      font-family: "Inter", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(0,0,0,0.3);
+      animation: fadeIn 0.6s ease;
+    }
+    .warning {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    .message {
+      font-size: 20px;
+      color: #ddd;
+      margin-bottom: 25px;
+    }
+    .button {
+      background: #ff5555;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .button:hover {
+      background: #ff7777;
+      transform: scale(1.05);
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.95);}
+      to {opacity: 1; transform: scale(1);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="warning">⚠️</div>
+    <div class="message">Этот токен уже использован</div>
+    <button class="button" onclick="window.location.href='https://djekxa.ru'">Вернуться на сайт</button>
+  </div>
+</body>
+</html>
