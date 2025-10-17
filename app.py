@@ -4,13 +4,12 @@ import requests
 
 app = Flask(__name__)
 
-# --- HTML форма ---
+# --- HTML форма (только ник) ---
 FORM_HTML = """
-<h2>Укажите ник и количество</h2>
+<h2>Укажите ник</h2>
 <form method="post">
   <input type="hidden" name="token" value="{{token}}">
   Ник: <input name="username" required><br>
-  Количество: <input type="number" name="quantity" min="1" required><br>
   <button type="submit">Отправить</button>
 </form>
 """
@@ -37,38 +36,30 @@ def claim():
     conn = sqlite3.connect("db.sqlite")
     cur = conn.cursor()
 
-    # проверка токена
-    cur.execute("SELECT used FROM tokens WHERE token=?", (token,))
+    # проверка токена и получение quantity
+    cur.execute("SELECT used, quantity FROM tokens WHERE token=?", (token,))
     row = cur.fetchone()
     if not row:
         conn.close()
         return "Неверный токен", 400
-    if row[0]:
+    used, quantity = row
+    if used:
         conn.close()
         return "Этот токен уже использован", 400
 
     if request.method == "GET":
+        # показываем форму без поля количества
         return render_template_string(FORM_HTML, token=token)
 
     # POST — обработка формы
     username = request.form.get("username").strip()
-    quantity = request.form.get("quantity").strip()
-    if not username or not quantity:
+    if not username:
         conn.close()
         return "Неверные данные", 400
 
-    try:
-        quantity = int(quantity)
-        if quantity <= 0:
-            raise ValueError
-    except:
-        conn.close()
-        return "Неверное количество", 400
-
-    # сохранить заказ
+    # сохраняем заказ с quantity из токена
     cur.execute("INSERT INTO orders (token, username, quantity) VALUES (?,?,?)",
                 (token, username, quantity))
-    # пометить токен как использованный
     cur.execute("UPDATE tokens SET used=1 WHERE token=?", (token,))
     conn.commit()
     conn.close()
@@ -101,3 +92,4 @@ def orders():
 # --- Запуск ---
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
