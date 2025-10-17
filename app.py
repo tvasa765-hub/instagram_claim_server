@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template_string
 import sqlite3
+import requests
 
 app = Flask(__name__)
 
@@ -14,18 +15,25 @@ FORM_HTML = """
 </form>
 """
 
-# --- Функция уведомлений (пока пустая, Telegram нет) ---
-def send_telegram(text):
-    pass  # уведомлений нет
+# --- Telegram уведомления ---
+BOT_TOKEN = "8266250354:AAHp6fCgA7Q3TnyuUZ2_6ueZAucO4kWVpdQ"  # твой токен бота
+CHAT_ID = "5737355586"  # твой chat_id
 
-# --- Главный роут ---
+def send_telegram(text):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    data = {"chat_id": CHAT_ID, "text": text}
+    try:
+        requests.post(url, data=data)
+    except Exception as e:
+        print("Ошибка при отправке Telegram:", e)
+
+# --- Главный роут /claim ---
 @app.route("/claim", methods=["GET", "POST"])
 def claim():
     token = request.values.get("token")
     if not token:
         return "Токен не передан", 400
 
-    # подключение к базе
     conn = sqlite3.connect("db.sqlite")
     cur = conn.cursor()
 
@@ -40,7 +48,6 @@ def claim():
         return "Этот токен уже использован", 400
 
     if request.method == "GET":
-        # показать форму
         return render_template_string(FORM_HTML, token=token)
 
     # POST — обработка формы
@@ -66,15 +73,17 @@ def claim():
     conn.commit()
     conn.close()
 
-    # уведомление (пока пустое)
+    # уведомление в Telegram
     send_telegram(f"Новый заказ!\nТокен: {token}\nНик: {username}\nКоличество: {quantity}")
 
     return f"Заказ принят! Ник: {username}, Количество: {quantity}"
 
+# --- Маршрут / для проверки ---
 @app.route("/")
 def home():
     return "Server is running! Используй маршрут /claim для формы."
 
-# --- Запуск локально ---
+# --- Запуск ---
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
